@@ -15,17 +15,6 @@ $(document).ready(function () {
         moment().format("LT")
     );
 
-    /*---------- Item Niveau Sonore, Présents et Dernière Activité ----------*/
-
-    var itemNiveau = niveauSon[niveauSon.length - 1];
-    $("#itemNiveau").text(itemNiveau);
-    for (var i = 0; i <= 120; i += 5) {
-        if (itemNiveau >= i) {
-            var itemPresents = (i - 30) / 2 >= 0 ? (i - 30) / 2 : 0;
-            $("#itemPresents").text(itemPresents);
-        }
-    }
-
 });
 
 /*---------- Graphique ----------*/
@@ -63,7 +52,7 @@ var options = {
             yAxes: [
                 {
                     gridLines: {
-                        color: "rgba(150, 150, 150, 0.08)",
+                        color: "rgba(200, 200, 200, 0.2)",
                         lineWidth: 1
                     },
                     scaleLabel: {
@@ -116,13 +105,13 @@ var options = {
                 borderWidth: 5,
                 borderColor: "#55E4D4",
                 backgroundColor: "#fff",
-                pointRadius: 6,
-                pointHoverRadius: 6,
-                pointBorderWidth: 2,
-                pointHoverBorderWidth: 2,
+                pointRadius: 8,
+                pointHoverRadius: 8,
+                pointBorderWidth: 3,
+                pointHoverBorderWidth: 3,
                 pointBackgroundColor: "#55E4D4",
                 pointBorderColor: "#fff",
-                pointHoverBorderColor: "#073B4C",
+                pointHoverBorderColor: "#293B5A",
                 data: niveauSon
             }
         ]
@@ -183,12 +172,8 @@ function fillSelect(currCat, currList) {
     }
 }
 
-function init() {
-    fillSelect("startList", document.forms.tripleplay.List1);
-}
-
 $(document).ready(function () {
-    init();
+    fillSelect("startList", document.forms.tripleplay.List1);
 });
 
 /*---------- REQUETE XHR GRAPH ----------*/
@@ -237,7 +222,6 @@ function initialize() {
     // Afficher toutes les salles au début puis
     // updateDisplay
     groupeFinal = salles;
-    updateDisplay();
 
     // Réinitialiser le filtrage
     groupeSelect = [];
@@ -249,11 +233,11 @@ function initialize() {
     batimentSelect.onchange = function() {
         filterSelect;
         fillSelect(this.value, this.form.List2);
-    }
+    };
     etageSelect.onchange = function() {
         filterSelect;
         fillSelect(this.value, this.form.List3);
-    }
+    };
     salleSelect.onchange = filterSelect;
     rechercheBouton.onclick = filterSelect;
 
@@ -318,6 +302,10 @@ function initialize() {
             for (var sa = 0; sa < salles.length; sa++) {
                 if (groupeSelect[sa].salle.indexOf(recherche.value.trim()) !== -1) {
                     groupeFinal.push(groupeSelect[sa]);
+                    batimentSelect.value = groupeSelect[sa].batiment;
+                    etageSelect.value = groupeSelect[sa].etage;
+                    salleSelect.value = groupeSelect[sa].salle;
+                    idNomSalle.textContent = 'Salle ' + salleSelect.value;
                 }
             }
             updateDisplay();
@@ -356,17 +344,17 @@ function initialize() {
             nomSalle = arraySalle.salle;
 
         var newDataset = {
-            label: "Niveau sonore " + nomSalle,
+            label: "Niveau sonore en " + nomSalle,
             borderWidth: 5,
             borderColor: colorString,
             fill: false,
-            pointRadius: 6,
-            pointHoverRadius: 6,
-            pointBorderWidth: 2,
-            pointHoverBorderWidth: 2,
+            pointRadius: 8,
+            pointHoverRadius: 8,
+            pointBorderWidth: 3,
+            pointHoverBorderWidth: 3,
             pointBackgroundColor: colorString,
             pointBorderColor: "#fff",
-            pointHoverBorderColor: "#073B4C",
+            pointHoverBorderColor: "#293B5A",
             data: arraySalle.niveau
         };
 
@@ -374,6 +362,21 @@ function initialize() {
         myChart.config.data.datasets.push(newDataset);
 
         myChart.update();
+
+        updateItem(arraySalle.niveau[arraySalle.niveau.length - 1]);
+    }
+
+    // Item Niveau Sonore, Présents et Dernière Activité
+
+    function updateItem(itemNiveau) {
+
+        document.querySelector("#itemNiveau").textContent = itemNiveau;
+        for (var i = 0; i <= 120; i += 5) {
+            if (itemNiveau >= i) {
+                var itemPresents = (i - 30) / 2 >= 0 ? (i - 30) / 2 : 0;
+                document.querySelector("#itemPresents").textContent = Math.round(itemPresents);
+            }
+        }
     }
 
 }
