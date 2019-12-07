@@ -308,11 +308,9 @@ function initialize() {
                 groupeSelect = salles;
                 rechercheSalle();
             } else {
-                alert(typeof groupeSelect);
                 idNomSalle.textContent = 'Bâtiment ' + batimentSelect.value;
                 for (var sa = 0; sa < salles.length; sa++) {
                     if (salles[sa].batiment === batimentSelect.value) {
-                        alert(typeof groupeSelect);
                         groupeSelect.push(salles[sa]);
                         if (etageSelect.value !== "---") {
                             idNomSalle.textContent = 'Étage ' + etageSelect.value;
@@ -324,7 +322,7 @@ function initialize() {
                                         idNomSalle.textContent = 'Salle ' + salleSelect.value;
                                         for (sa = 0; sa < groupeSelect.length; sa++) {
                                             if (salles[sa].salle === salleSelect.value) {
-                                                groupeSelect = salles[sa];
+                                                groupeSelect = [salles[sa]];
                                             }
                                         }
                                     }
