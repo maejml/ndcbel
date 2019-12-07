@@ -312,22 +312,22 @@ function initialize() {
                 for (var sa = 0; sa < salles.length; sa++) {
                     if (salles[sa].batiment === batimentSelect.value) {
                         groupeSelect.push(salles[sa]);
-                        if (etageSelect.value !== "---") {
-                            idNomSalle.textContent = 'Étage ' + etageSelect.value;
-                            for (sa = 0; sa < groupeSelect.length; sa++) {
-                                if (salles[sa].etage === etageSelect.value) {
-                                    groupeSelect.push(salles[sa]);
-                                    groupeSelect.shift();
-                                    if (salleSelect.value !== "---") {
-                                        idNomSalle.textContent = 'Salle ' + salleSelect.value;
-                                        for (sa = 0; sa < groupeSelect.length; sa++) {
-                                            if (salles[sa].salle === salleSelect.value) {
-                                                groupeSelect = [salles[sa]];
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                    }
+                }
+                if (etageSelect.value !== "---") {
+                    idNomSalle.textContent = 'Étage ' + etageSelect.value;
+                    for (sa = 0; sa < groupeSelect.length; sa++) {
+                        if (salles[sa].etage === etageSelect.value) {
+                            groupeSelect.push(salles[sa]);
+                        }
+                        groupeSelect.shift();
+                    }
+                }
+                if (salleSelect.value !== "---") {
+                    idNomSalle.textContent = 'Salle ' + salleSelect.value;
+                    for (sa = 0; sa < groupeSelect.length; sa++) {
+                        if (salles[sa].salle === salleSelect.value) {
+                            groupeSelect = [salles[sa]];
                         }
                     }
                 }
@@ -358,6 +358,7 @@ function initialize() {
     function updateDisplay() {
         if (groupeFinal.length === 0) {
             idNomSalle.textContent = 'Aucune salle correspondante';
+            myChart.config.data.datasets = {data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
         } else {
             recupValeurs();
         }
@@ -379,8 +380,8 @@ function initialize() {
             colorString = colorArray[randomIntForColor],
             niveauArray = {};
 
-        // On remplit l'objet niveauArray avec pour
-        // chaque nom de salle en key le niveau sonore
+        // On remplit l'objet niveauArray avec, pour
+        // chaque nom de salle en key, le niveau sonore
         // correspondant en valeur
         for (var sa = 0; sa > groupeFinal.length; sa++) {
             var nomSalle = groupeFinal[sa].salle,
@@ -394,7 +395,9 @@ function initialize() {
             // et le nom de la salle en label
             var newDataset = {
                 label: chaqueSalle,
-                data: []
+                data: [],
+                borderColor: colorString,
+                pointBackgroundColor: colorString,
             };
 
             // Pour chaque valeur dans cette salle
