@@ -135,7 +135,7 @@ var myChart = new Chart(ctx, {
 
     options: options,
 
-    plugins: [shadowed]
+    //plugins: [shadowed]
 });
 
 /*---------- SELECT DÉPENDANTS ----------*/
@@ -329,6 +329,8 @@ function initialize() {
             idNomSalle.textContent = 'Aucune salle correspondante';
             myChart.config.data.datasets = {data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
         } else {
+            // On enlève toutes les valeurs du graph
+            myChart.config.data.datasets.length = 0;
             for (var sa = 0; sa < groupeFinal.length; sa++) {
                 recupValeurs(groupeFinal[sa]);
             }
@@ -336,9 +338,6 @@ function initialize() {
     }
 
     function recupValeurs(arraySalle) {
-
-        // On enlève toutes les valeurs du graph
-        myChart.config.data.datasets.length = 0;
 
         function getRandomInt(min, max) {
             min = Math.ceil(min);
@@ -350,17 +349,17 @@ function initialize() {
                 "#EF476F",
                 "#FFD166",
                 "#55E4D4",
-                "#118AB2",
-                "#073B4C"
+                "#118AB2"
             ],
-            randomIntForColor = getRandomInt(0,4),
-            colorString = colorArray[randomIntForColor];
+            randomIntForColor = getRandomInt(0,3),
+            colorString = colorArray[randomIntForColor],
+            nomSalle = arraySalle.salle;
 
         var newDataset = {
-            label: "Niveau sonore",
+            label: "Niveau sonore " + nomSalle,
             borderWidth: 5,
             borderColor: colorString,
-            backgroundColor: "#fff",
+            fill: false,
             pointRadius: 6,
             pointHoverRadius: 6,
             pointBorderWidth: 2,

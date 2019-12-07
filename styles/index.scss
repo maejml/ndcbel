@@ -11,7 +11,6 @@ $c-chevron-rouge: #FF5D87;
 $c-chevron-vert: #49D8B6;
 
 $w-texte: 13px;
-$w-sidebar: 10vw;
 $w-recherche: 10vw;
 $w-sub-left: 80vw;
 $w-sub-right: 18vw;
@@ -92,7 +91,7 @@ body, button {
   & h1 {
     font-size: 2em;
     font-weight: 100;
-    padding: 0 0 0 1em;
+    padding: 0 0 0 20px;
     color: $c-bleu-2;
   }
   & span {
@@ -150,10 +149,6 @@ input#search-bar{
       transition: opacity 0.45s ease; 
   	  opacity: 0;
      }
-    &:-ms-placeholder {
-     transition: opacity 0.45s ease; 
-  	 opacity: 0;
-     }    
    }
  }
 
