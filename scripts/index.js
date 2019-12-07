@@ -1,0 +1,415 @@
+/*jslint browser: true*/
+/*global $, jQuery, alert*/
+/*global moment*/
+
+$(document).ready(function () {
+
+    /*---------- Menu latéral gauche ----------*/
+    function toggleSidebar(el) {
+        $(el).toggleClass("active");
+        $("body").toggleClass("move-to-left");
+    }
+
+    $(".hamburger").on("click tap", function () {
+        toggleSidebar(this);
+    });
+
+    function changeSection(target) {
+        $(target).addClass("active");
+        $("#sidebar button")
+            .not(target)
+            .removeClass("active");
+        $(".section").removeClass("active");
+        let dataSection = $(target).attr("data-section");
+        $(".section[data-section='" + dataSection + "']").addClass("active");
+    }
+
+    $("#sidebar button").on("click tap", function () {
+        changeSection(this);
+    });
+
+    /*---------- Hauteur Hamburger ----------*/
+
+    let barSize = $(".barre-haute").height(),
+        buttonSize = $(".nav-click").height(),
+        topButton = barSize / 2 - buttonSize / 2;
+    $(".nav-click").css("top", topButton);
+
+    /*---------- DATE ACTUELLE ----------*/
+
+    moment.locale("fr");
+    $("#intervalDate").text(
+        moment().format("LL") +
+        " : de " +
+        moment().subtract(2.5, "hours").format("LT") +
+        " à " +
+        moment().format("LT")
+    );
+
+    /*---------- Item Niveau Sonore, Présents et Dernière Activité ----------*/
+
+    var itemNiveau = niveauSon[niveauSon.length - 1];
+    $("#itemNiveau").text(itemNiveau);
+    for (var i = 0; i <= 120; i += 5) {
+        if (itemNiveau >= i) {
+            var itemPresents = (i - 30) / 2 >= 0 ? (i - 30) / 2 : 0;
+            $("#itemPresents").text(itemPresents);
+        }
+    }
+
+});
+
+/*---------- Graphique ----------*/
+
+let ctx = document.querySelector("#myChart");
+
+var niveauSon = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    labels = [];
+for (var n = niveauSon.length; n > 0; n--) {
+    moment.relativeTimeThreshold("m", 60);
+    let label =
+        moment()
+            .subtract(n * 15, "minutes")
+            .format("LT") +
+        "\n" +
+        moment()
+            .subtract(n * 15, "minutes")
+            .fromNow();
+    labels.push(label);
+}
+
+var options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+            easing: "easeInOutQuad",
+            duration: 1500
+        },
+        scales: {
+            xAxes: [
+                {
+                    display: false
+                }
+            ],
+            yAxes: [
+                {
+                    gridLines: {
+                        color: "rgba(150, 150, 150, 0.08)",
+                        lineWidth: 1
+                    },
+                    scaleLabel: {
+                        labelString: "",
+                        fontColor: "rgba(200, 200, 200, 0.5)",
+                        fontSize: 10
+                    },
+                    ticks: {
+                        fontColor: "rgba(200, 200, 200, 0.8)",
+                        fontSize: 14
+                    }
+                }
+            ]
+        },
+        elements: {
+            line: {
+                tension: 0.4
+            }
+        },
+        legend: {
+            display: false
+        },
+        point: {
+            backgroundColor: "white"
+        },
+        layout: {
+            padding: {
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 20
+            }
+        }
+    },
+    shadowed = {
+        beforeDatasetsDraw: function (chart, options) {
+            chart.ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+            chart.ctx.shadowBlur = 15;
+        },
+        afterDatasetsDraw: function (chart, options) {
+            chart.ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+            chart.ctx.shadowBlur = 5;
+        }
+    },
+    data = {
+        labels: labels,
+        datasets: [
+            {
+                label: "Niveau sonore",
+                borderWidth: 5,
+                borderColor: "#55E4D4",
+                backgroundColor: "#fff",
+                pointRadius: 6,
+                pointHoverRadius: 6,
+                pointBorderWidth: 2,
+                pointHoverBorderWidth: 2,
+                pointBackgroundColor: "#55E4D4",
+                pointBorderColor: "#fff",
+                pointHoverBorderColor: "#073B4C",
+                data: niveauSon
+            }
+        ]
+    };
+
+var myChart = new Chart(ctx, {
+    type: "line",
+
+    data: data,
+
+    options: options,
+
+    plugins: [shadowed]
+});
+
+/*---------- SELECT DÉPENDANTS ----------*/
+
+var categories = [];
+categories.startList = ["ND des Champs", "ND de Lorette"];
+categories["ND des Champs"] = [
+    "NDC - 1er",
+    "NDC - 2e",
+    "NDC - 3e",
+    "NDC - 4e",
+    "NDC - 5e"
+];
+categories["ND de Lorette"] = [
+    "NDL - 1er",
+    "NDL - 2e",
+    "NDL - 3e",
+    "NDL - 4e"
+];
+categories["NDC - 1er"] = ["N15", "N16-A", "N16-B", "N18"];
+categories["NDC - 2e"] = ["N24", "N26", "N28"];
+categories["NDC - 3e"] = ["N33", "N34", "N36", "N38"];
+categories["NDC - 4e"] = ["N43", "N44", "N46", "N48-A", "N48-B"];
+categories["NDC - 5e"] = ["N410", "N411"];
+categories["NDL - 1er"] = ["L108", "L114", "L115", "L122"];
+categories["NDL - 2e"] = ["L206", "L207", "L212", "L213", "L220"];
+categories["NDL - 3e"] = ["L305", "L306", "L311", "L312", "L313"];
+categories["NDL - 4e"] = ["L409", "L416", "L417"];
+
+var nLists = 3; // nombre de select
+
+function fillSelect(currCat, currList) {
+    var step = Number(currList.name.replace(/\D/g, ""));
+    for (var i = step; i < nLists + 1; i++) {
+        document.forms.tripleplay["List" + i].length = 1;
+        document.forms.tripleplay["List" + i].selectedIndex = 0;
+    }
+    var nCat = categories[currCat];
+    for (var each in nCat) {
+        var nOption = document.createElement("option");
+        var nData = document.createTextNode(nCat[each]);
+        nOption.setAttribute("value", nCat[each]);
+        nOption.appendChild(nData);
+        currList.appendChild(nOption);
+    }
+}
+
+function init() {
+    fillSelect("startList", document.forms.tripleplay.List1);
+}
+
+$(document).ready(function () {
+    init();
+});
+
+/*---------- REQUETE XHR GRAPH ----------*/
+
+var salles;
+
+// Etablir la requête XHR
+let request = new XMLHttpRequest();
+request.open("GET","salles.json", true);
+request.responseType = "json";
+request.onload = function() {
+    if(request.status === 200) {
+        salles = request.response;
+        initialize();
+    } else {
+        console.log('La demande réseau pour salles.json a échoué avec la réponse ' + request.status + ': ' + request.statusText)
+    }
+};
+
+request.send();
+
+
+
+// Initialiser le processus avec fonctions et var principales
+function initialize() {
+    // Récupérer les filtrages
+    var batimentSelect = document.forms.tripleplay.List1,
+        etageSelect = document.forms.tripleplay.List2,
+        salleSelect = document.forms.tripleplay.List3,
+        recherche = document.querySelector("#search-bar"),
+        rechercheBouton = document.querySelector("#search-button"),
+        idNomSalle = document.querySelector("#nomSalle");
+
+    // Réinitialiser les paramètres et mémoire de catégorie
+    var derBatiment = batimentSelect.value,
+        derEtage = etageSelect.value,
+        derSalle = salleSelect.value,
+        derRecherche = '';
+
+    // Contient les données de l'étage puis
+    // groupeFinal contient les données après
+    // le filtrage de recherche
+    var groupeSelect,
+        groupeFinal;
+
+    // Afficher toutes les salles au début puis
+    // updateDisplay
+    groupeFinal = salles;
+    updateDisplay();
+
+    // Réinitialiser le filtrage
+    groupeSelect = [];
+    groupeFinal = [];
+
+    // Quand le select change ou quand
+    // une recherche est lancée, invoquer
+    // le filterSelect
+    batimentSelect.onchange = function() {
+        filterSelect;
+        fillSelect(this.value, this.form.List2);
+    }
+    etageSelect.onchange = function() {
+        filterSelect;
+        fillSelect(this.value, this.form.List3);
+    }
+    salleSelect.onchange = filterSelect;
+    rechercheBouton.onclick = filterSelect;
+
+    function filterSelect(e) {
+        e.preventDefault();
+
+        // Réinitialiser le filtrage
+        groupeSelect = [];
+        groupeFinal = [];
+
+        if (batimentSelect.value === derBatiment && etageSelect.value === derEtage && salleSelect.value === derSalle && recherche.value.trim() === derRecherche) {
+            return;
+        } else {
+            // Initialiser le filtrage et la recherche
+            derBatiment = batimentSelect.value;
+            derEtage = etageSelect.value;
+            derSalle = salleSelect.value;
+            derRecherche = recherche.value.trim();
+
+            if (batimentSelect.value === "---") {
+                groupeSelect = salles;
+                rechercheSalle();
+            } else {
+                alert(typeof groupeSelect);
+                idNomSalle.textContent = 'Bâtiment ' + batimentSelect.value;
+                for (var sa = 0; sa < salles.length; sa++) {
+                    if (salles[sa].batiment === batimentSelect.value) {
+                        alert(typeof groupeSelect);
+                        groupeSelect.push(salles[sa]);
+                        if (etageSelect.value !== "---") {
+                            idNomSalle.textContent = 'Étage ' + etageSelect.value;
+                            for (sa = 0; sa < groupeSelect.length; sa++) {
+                                if (salles[sa].etage === etageSelect.value) {
+                                    groupeSelect.push(salles[sa]);
+                                    groupeSelect.shift();
+                                    if (salleSelect.value !== "---") {
+                                        idNomSalle.textContent = 'Salle ' + salleSelect.value;
+                                        for (sa = 0; sa < groupeSelect.length; sa++) {
+                                            if (salles[sa].salle === salleSelect.value) {
+                                                groupeSelect = salles[sa];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                rechercheSalle();
+            }
+        }
+    }
+
+    function rechercheSalle() {
+        // Si aucun mot de recherche, le groupe final
+        // est celui filtré par les catégories
+        if (recherche.value.trim() === '') {
+            groupeFinal = groupeSelect;
+            updateDisplay();
+        } else {
+            // Pour chaque salle voir si le mot de recherche
+            // est contenu dans un des noms de salle, (sinon
+            // indexOf retourne -1) et l'ajouter dans le groupeFinal
+            for (var sa = 0; sa < salles.length; sa++) {
+                if (groupeSelect[sa].salle.indexOf(recherche.value.trim()) !== -1) {
+                    groupeFinal.push(groupeSelect[sa]);
+                }
+            }
+            updateDisplay();
+        }
+    }
+
+    function updateDisplay() {
+        if (groupeFinal.length === 0) {
+            idNomSalle.textContent = 'Aucune salle correspondante';
+        } else {
+            recupValeurs();
+        }
+    }
+
+    function recupValeurs() {
+
+        // On enlève toutes les valeurs du graph
+        myChart.config.data.datasets.length = 0;
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        var colorArray = ["#EF476F","#FFD166","#55E4D4","#118AB2","#073B4C"],
+            randomIntForColor = getRandomInt(0,4),
+            colorString = colorArray[randomIntForColor],
+            niveauArray = {};
+
+        // On remplit l'objet niveauArray avec pour
+        // chaque nom de salle en key le niveau sonore
+        // correspondant en valeur
+        for (var sa = 0; sa > groupeFinal.length; sa++) {
+            var nomSalle = groupeFinal[sa].salle,
+                niveauSalle = groupeFinal[sa].niveau;
+            niveauArray[nomSalle] = niveauSalle;
+        }
+
+        // Pour chaque liste de niveaux dans la liste
+        for (chaqueSalle in niveauArray) {
+            // Création une nouvelle dataset sans valeurs
+            // et le nom de la salle en label
+            var newDataset = {
+                label: chaqueSalle,
+                data: []
+            };
+
+            // Pour chaque valeur dans cette salle
+            for (niveau in niveauArray[chaqueSalle]) {
+                // On crée la nouvelle dataset
+                newDataset.data.push(niveauArray[chaqueSalle][niveau]);
+            }
+
+            // On ajoute la dataset au graph
+            myChart.config.data.datasets.push(newDataset);
+        }
+
+        myChart.update();
+    }
+
+}
