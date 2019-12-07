@@ -329,12 +329,13 @@ function initialize() {
             idNomSalle.textContent = 'Aucune salle correspondante';
             myChart.config.data.datasets = {data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
         } else {
-            recupValeurs();
-            console.log(groupeFinal);
+            for (var sa = 0; sa < groupeFinal.length; sa++) {
+                recupValeurs(groupeFinal[sa]);
+            }
         }
     }
 
-    function recupValeurs() {
+    function recupValeurs(arraySalle) {
 
         // On enlève toutes les valeurs du graph
         myChart.config.data.datasets.length = 0;
@@ -345,41 +346,33 @@ function initialize() {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        var colorArray = ["#EF476F","#FFD166","#55E4D4","#118AB2","#073B4C"],
+        var colorArray = [
+                "#EF476F",
+                "#FFD166",
+                "#55E4D4",
+                "#118AB2",
+                "#073B4C"
+            ],
             randomIntForColor = getRandomInt(0,4),
-            colorString = colorArray[randomIntForColor],
-            niveauArray = {};
+            colorString = colorArray[randomIntForColor];
 
-        // On remplit l'objet niveauArray avec, pour
-        // chaque nom de salle en key, le niveau sonore
-        // correspondant en valeur
-        for (var sa = 0; sa > groupeFinal.length; sa++) {
-            var nomSalle = groupeFinal[sa].salle,
-                niveauSalle = groupeFinal[sa].niveau;
-            niveauArray[nomSalle] = niveauSalle;
-        }
-        console.log(niveauArray);
+        var newDataset = {
+            label: "Niveau sonore",
+            borderWidth: 5,
+            borderColor: colorString,
+            backgroundColor: "#fff",
+            pointRadius: 6,
+            pointHoverRadius: 6,
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 2,
+            pointBackgroundColor: colorString,
+            pointBorderColor: "#fff",
+            pointHoverBorderColor: "#073B4C",
+            data: arraySalle.niveau
+        };
 
-        // Pour chaque liste de niveaux dans la liste
-        for (chaqueSalle in niveauArray) {
-            // Création une nouvelle dataset sans valeurs
-            // et le nom de la salle en label
-            var newDataset = {
-                label: chaqueSalle,
-                data: [],
-                borderColor: colorString,
-                pointBackgroundColor: colorString,
-            };
-
-            // Pour chaque valeur dans cette salle
-            for (niveau in niveauArray[chaqueSalle]) {
-                // On crée la nouvelle dataset
-                newDataset.data.push(niveauArray[chaqueSalle][niveau]);
-            }
-
-            // On ajoute la dataset au graph
-            myChart.config.data.datasets.push(newDataset);
-        }
+        // On ajoute la dataset au graph
+        myChart.config.data.datasets.push(newDataset);
 
         myChart.update();
     }
