@@ -49,7 +49,7 @@ p {
 
 /* Transitions et animations */
 
-body, .bar, .hamburger, button {
+body, button {
   -webkit-transition: all .7s ease;
   -moz-transition: all .7s ease;
   -ms-transition: all .7s ease;
@@ -60,7 +60,7 @@ body, .bar, .hamburger, button {
 @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 @-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-.section, .nav-click {
+.section {
    opacity:0;
    -webkit-animation:fadeIn ease-in 1;
    -moz-animation:fadeIn ease-in 1;
@@ -73,101 +73,12 @@ body, .bar, .hamburger, button {
    animation-duration:1s;
 }
 
-/* Sidebar */
-
-#sidebar {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: - $w-sidebar;
-  width: $w-sidebar;
-  height: 100vh;
-  padding: 0.5em;
-  background: $c-bleu-2;
-}
-
-.bar {
-  display: block;
-  height: 2.5px;
-  width: 25px;
-  background-color: $c-bleu-1;
-  margin: 5px auto;
-}
-
-.hamburger {
-  cursor: pointer;
-  display: inline-block;
-  width: auto;
-  margin: 0 auto;
-}
-
-.nav-click {
-  z-index: 10;
-  position: absolute;
-  left: 25px;
-}
-
-.middle {
-  margin: 0 auto;
-}
-
-.hamburger.active .top {
-  -webkit-transform: translateY(7.5px) rotateZ(45deg);
-  -moz-transform: translateY(7.5px) rotateZ(45deg);
-  -ms-transform: translateY(7.5px) rotateZ(45deg);
-  -o-transform: translateY(7.5px) rotateZ(45deg);
-  transform: translateY(7.5px) rotateZ(45deg);
-}
-
-.hamburger.active .bottom {
-  -webkit-transform: translateY(-7.5px) rotateZ(-45deg);
-  -moz-transform: translateY(-7.5px) rotateZ(-45deg);
-  -ms-transform: translateY(-7.5px) rotateZ(-45deg);
-  -o-transform: translateY(-7.5px) rotateZ(-45deg);
-  transform: translateY(-7.5px) rotateZ(-45deg);
-}
-
-.hamburger.active .middle {
-  width: 0;
-}
-
-.move-to-left {
-  -webkit-transform: translateX($w-sidebar);
-  -moz-transform: translateX($w-sidebar);
-  -ms-transform: translateX($w-sidebar);
-  -o-transform: translateX($w-sidebar);
-  transform: translateX($w-sidebar);
-}
-
-#sidebar button {
-  width: $w-sidebar;
-  min-width: 50px;
-  min-height: 20px;
-  padding: 1.5em;
-  font-size: 1em;
-  background: $c-bleu-2;
-  color: $c-bleu-1;
-  display: inline-block;
-  border: none;
-  margin: 0;
-  text-decoration: none;
-  cursor: pointer;
-  &.active {
-    color: $c-vert;
-    text-shadow: .5px .5px 4px black, 0 0 1em $c-vert, 0 0 0.2em $c-vert;
-  }
-}
-
 /*-- Sections --*/
 
 .section {
   display: none;
   width: 100vw;
   height: 100vh;
-}
-
-.section.active {
-  display: block;
 }
 
 .barre-haute {

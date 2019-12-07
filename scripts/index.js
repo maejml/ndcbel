@@ -4,37 +4,6 @@
 
 $(document).ready(function () {
 
-    /*---------- Menu latéral gauche ----------*/
-    function toggleSidebar(el) {
-        $(el).toggleClass("active");
-        $("body").toggleClass("move-to-left");
-    }
-
-    $(".hamburger").on("click tap", function () {
-        toggleSidebar(this);
-    });
-
-    function changeSection(target) {
-        $(target).addClass("active");
-        $("#sidebar button")
-            .not(target)
-            .removeClass("active");
-        $(".section").removeClass("active");
-        let dataSection = $(target).attr("data-section");
-        $(".section[data-section='" + dataSection + "']").addClass("active");
-    }
-
-    $("#sidebar button").on("click tap", function () {
-        changeSection(this);
-    });
-
-    /*---------- Hauteur Hamburger ----------*/
-
-    let barSize = $(".barre-haute").height(),
-        buttonSize = $(".nav-click").height(),
-        topButton = barSize / 2 - buttonSize / 2;
-    $(".nav-click").css("top", topButton);
-
     /*---------- DATE ACTUELLE ----------*/
 
     moment.locale("fr");
@@ -361,6 +330,7 @@ function initialize() {
             myChart.config.data.datasets = {data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
         } else {
             recupValeurs();
+            console.log(groupeFinal);
         }
     }
 
@@ -388,6 +358,7 @@ function initialize() {
                 niveauSalle = groupeFinal[sa].niveau;
             niveauArray[nomSalle] = niveauSalle;
         }
+        console.log(niveauArray);
 
         // Pour chaque liste de niveaux dans la liste
         for (chaqueSalle in niveauArray) {
