@@ -198,10 +198,10 @@ function initialize() {
     // Quand le select change ou quand
     // une recherche est lancée, invoquer
     // le filterSelect
-    $(batimentSelect).change(filterSelect);
-    $(etageSelect).change(filterSelect);
-    $(salleSelect).change(filterSelect);
-    rechercheBouton.onclick = filterSelect();
+    batimentSelect.onchange = filterSelect;
+    etageSelect.onchange = filterSelect;
+    salleSelect.onchange = filterSelect;
+    rechercheBouton.onclick = filterSelect;
 
     function filterSelect() {
 
@@ -291,11 +291,27 @@ function initialize() {
             // Pour chaque salle voir si le mot de recherche
             // est contenu dans un des noms de salle, (sinon
             // indexOf retourne -1) et l'ajouter dans le groupeFinal
-            for (var sa = 0; sa < salles.length; sa++) {
+            for (var sa = 0; sa < groupeSelect.length; sa++) {
                 if (groupeSelect[sa].salle.indexOf(recherche.value.trim()) !== -1) {
                     groupeFinal.push(groupeSelect[sa]);
                     batimentSelect.value = groupeSelect[sa].batiment;
+                    var nCat = categories[batimentSelect.value];
+                    for (var each in nCat) {
+                        var nOption = document.createElement("option");
+                        var nData = document.createTextNode(nCat[each]);
+                        nOption.setAttribute("value", nCat[each]);
+                        nOption.appendChild(nData);
+                        etageSelect.appendChild(nOption);
+                    }
                     etageSelect.value = groupeSelect[sa].etage;
+                    var nCat = categories[etageSelect.value];
+                    for (var each in nCat) {
+                        var nOption = document.createElement("option");
+                        var nData = document.createTextNode(nCat[each]);
+                        nOption.setAttribute("value", nCat[each]);
+                        nOption.appendChild(nData);
+                        salleSelect.appendChild(nOption);
+                    }
                     salleSelect.value = groupeSelect[sa].salle;
                     idNomSalle.textContent = 'Salle ' + salleSelect.value;
                 }
