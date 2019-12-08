@@ -87,16 +87,6 @@ var options = {
             }
         }
     },
-    shadowed = {
-        beforeDatasetsDraw: function (chart, options) {
-            chart.ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-            chart.ctx.shadowBlur = 15;
-        },
-        afterDatasetsDraw: function (chart, options) {
-            chart.ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-            chart.ctx.shadowBlur = 5;
-        }
-    },
     data = {
         labels: labels,
         datasets: [
@@ -123,8 +113,6 @@ var myChart = new Chart(ctx, {
     data: data,
 
     options: options,
-
-    //plugins: [shadowed]
 });
 
 /*---------- SELECT DÉPENDANTS ----------*/
@@ -154,28 +142,6 @@ categories["NDL - 2e"] = ["L206", "L207", "L212", "L213", "L220"];
 categories["NDL - 3e"] = ["L305", "L306", "L311", "L312", "L313"];
 categories["NDL - 4e"] = ["L409", "L416", "L417"];
 
-var nLists = 3; // nombre de select
-
-function fillSelect(currCat, currList) {
-    var step = Number(currList.name.replace(/\D/g, ""));
-    for (var i = step; i < nLists + 1; i++) {
-        document.forms.tripleplay["List" + i].length = 1;
-        document.forms.tripleplay["List" + i].selectedIndex = 0;
-    }
-    var nCat = categories[currCat];
-    for (var each in nCat) {
-        var nOption = document.createElement("option");
-        var nData = document.createTextNode(nCat[each]);
-        nOption.setAttribute("value", nCat[each]);
-        nOption.appendChild(nData);
-        currList.appendChild(nOption);
-    }
-}
-
-$(document).ready(function () {
-    fillSelect("startList", document.forms.tripleplay.List1);
-});
-
 /*---------- REQUETE XHR GRAPH ----------*/
 
 var salles;
@@ -199,6 +165,7 @@ request.send();
 
 // Initialiser le processus avec fonctions et var principales
 function initialize() {
+
     // Récupérer les filtrages
     var batimentSelect = document.forms.tripleplay.List1,
         etageSelect = document.forms.tripleplay.List2,
@@ -217,6 +184,7 @@ function initialize() {
     // groupeFinal contient les données après
     // le filtrage de recherche
     var groupeSelect,
+        groupeInt,
         groupeFinal;
 
     // Afficher toutes les salles au début puis
@@ -230,27 +198,51 @@ function initialize() {
     // Quand le select change ou quand
     // une recherche est lancée, invoquer
     // le filterSelect
-    batimentSelect.onchange = function() {
-        filterSelect;
-        fillSelect(this.value, this.form.List2);
-    };
-    etageSelect.onchange = function() {
-        filterSelect;
-        fillSelect(this.value, this.form.List3);
-    };
-    salleSelect.onchange = filterSelect;
-    rechercheBouton.onclick = filterSelect;
+    $(batimentSelect).change(filterSelect);
+    $(etageSelect).change(filterSelect);
+    $(salleSelect).change(filterSelect);
+    rechercheBouton.onclick = filterSelect();
 
-    function filterSelect(e) {
-        e.preventDefault();
+    function filterSelect() {
 
         // Réinitialiser le filtrage
         groupeSelect = [];
+        groupeInt = [];
         groupeFinal = [];
 
         if (batimentSelect.value === derBatiment && etageSelect.value === derEtage && salleSelect.value === derSalle && recherche.value.trim() === derRecherche) {
             return;
         } else {
+
+            // Changer si nécessaire le contenu des select
+            if (derBatiment !== batimentSelect.value) {
+                etageSelect.length = 1;
+                etageSelect.selectedIndex = 0;
+                salleSelect.length = 1;
+                salleSelect.selectedIndex = 0;
+                var nCat = categories[batimentSelect.value];
+                for (var each in nCat) {
+                    var nOption = document.createElement("option");
+                    var nData = document.createTextNode(nCat[each]);
+                    nOption.setAttribute("value", nCat[each]);
+                    nOption.appendChild(nData);
+                    etageSelect.appendChild(nOption);
+                }
+            }
+
+            if (derEtage !== etageSelect.value) {
+                salleSelect.length = 1;
+                salleSelect.selectedIndex = 0;
+                var nCat = categories[etageSelect.value];
+                for (var each in nCat) {
+                    var nOption = document.createElement("option");
+                    var nData = document.createTextNode(nCat[each]);
+                    nOption.setAttribute("value", nCat[each]);
+                    nOption.appendChild(nData);
+                    salleSelect.appendChild(nOption);
+                }
+            }
+
             // Initialiser le filtrage et la recherche
             derBatiment = batimentSelect.value;
             derEtage = etageSelect.value;
@@ -270,17 +262,17 @@ function initialize() {
                 if (etageSelect.value !== "---") {
                     idNomSalle.textContent = 'Étage ' + etageSelect.value;
                     for (sa = 0; sa < groupeSelect.length; sa++) {
-                        if (salles[sa].etage === etageSelect.value) {
-                            groupeSelect.push(salles[sa]);
+                        if (groupeSelect[sa].etage === etageSelect.value) {
+                            groupeInt.push(groupeSelect[sa]);
                         }
-                        groupeSelect.shift();
                     }
+                    groupeSelect = groupeInt;
                 }
                 if (salleSelect.value !== "---") {
                     idNomSalle.textContent = 'Salle ' + salleSelect.value;
                     for (sa = 0; sa < groupeSelect.length; sa++) {
-                        if (salles[sa].salle === salleSelect.value) {
-                            groupeSelect = [salles[sa]];
+                        if (groupeSelect[sa].salle === salleSelect.value) {
+                            groupeSelect = [groupeSelect[sa]];
                         }
                     }
                 }
@@ -316,9 +308,11 @@ function initialize() {
         if (groupeFinal.length === 0) {
             idNomSalle.textContent = 'Aucune salle correspondante';
             myChart.config.data.datasets = {data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
+            myChart.update();
+            updateItem(myChart.config.data.datasets.data[10]);
         } else {
             // On enlève toutes les valeurs du graph
-            myChart.config.data.datasets.length = 0;
+            myChart.config.data.datasets = [];
             for (var sa = 0; sa < groupeFinal.length; sa++) {
                 recupValeurs(groupeFinal[sa]);
             }
